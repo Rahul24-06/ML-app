@@ -115,7 +115,7 @@ with col_left:
 with col_right:
     st.subheader("Confusion Matrix")
     cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(3,3))
+    fig, ax = plt.subplots(figsize=(1,1))
     ax.matshow(cm)
     for i in range(len(cm)):
         for j in range(len(cm)):
