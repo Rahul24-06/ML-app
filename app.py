@@ -44,6 +44,25 @@ model_name = st.sidebar.selectbox(
 st.sidebar.markdown("---")
 st.sidebar.write("Dataset Shape:", df.shape)
 st.sidebar.write("Features:", df.shape[1] - 1)
+st.sidebar.markdown("---")
+
+st.sidebar.subheader("Download sample test CSV")
+sample_test = df.sample(20, random_state=1)
+csv_buffer = io.StringIO()
+sample_test.to_csv(csv_buffer, index=False)
+
+st.sidebar.download_button(
+    label="Download Sample Test Data",
+    data=csv_buffer.getvalue(),
+    file_name="sample_test_heart.csv",
+    mime="text/csv"
+)
+st.markdown("---")
+
+st.sidebar.subheader("Upload test CSV for prediction")
+uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+st.markdown("---")
+
 
 X = df.drop("target", axis=1)
 y = df["target"]
@@ -111,23 +130,6 @@ for i in range(len(cm)):
 
 st.pyplot(fig)
 st.markdown("---")
-
-
-st.subheader("Download sample test CSV")
-sample_test = df.sample(20, random_state=1)
-csv_buffer = io.StringIO()
-sample_test.to_csv(csv_buffer, index=False)
-
-st.download_button(
-    label="Download Sample Test Data",
-    data=csv_buffer.getvalue(),
-    file_name="sample_test_heart.csv",
-    mime="text/csv"
-)
-st.markdown("---")
-
-st.subheader("Upload test CSV for prediction")
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
     test_data = pd.read_csv(uploaded_file)
