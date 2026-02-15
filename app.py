@@ -18,10 +18,9 @@ st.set_page_config(page_title="Heart Disease ML App", layout="wide")
 st.title("Heart Disease Classification App")
 st.markdown(
     """
-    <h4 style='text-align:center;color:gray;'>
-    Developed by: RAHUL KHANNA D 
-    2025AB05245
-    </h4>
+    <h6>
+    Developed by: RAHUL KHANNA D | 2025AB05245
+    </h6>
     """,
     unsafe_allow_html=True
 )
