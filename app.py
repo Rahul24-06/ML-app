@@ -16,18 +16,14 @@ from xgboost import XGBClassifier
 
 st.set_page_config(page_title="Heart Disease ML App", layout="wide")
 st.title("Heart Disease Classification App")
-st.markdown("""
-    <h1 style='text-align: center; color: #FF4B4B;'>
-    Heart Disease Prediction Dashboard 
-    </h1>
-""", unsafe_allow_html=True)
+st.info("Instructions: Please upload a CSV file from the sidebar OR select the default heart.csv dataset before proceeding.")
 st.markdown("---")
 
 @st.cache_data
-def load_default_data():
+def load_data():
     return pd.read_csv("heart.csv")
-    
-df = load_default_data()
+
+default_df = load_data()
 
 st.sidebar.header("Model Selection")
 model_name = st.sidebar.selectbox(
@@ -42,27 +38,27 @@ model_name = st.sidebar.selectbox(
     ]
 )
 st.sidebar.markdown("---")
+data_option = st.sidebar.radio(
+    "Choose Dataset",
+    ["Use Default heart.csv", "Upload Custom CSV"]
+)
+
+uploaded_file = None
+df = None
+
+if data_option == "Upload Custom CSV":
+    uploaded_file = st.sidebar.file_uploader("Upload CSV", type=["csv"])
+    if uploaded_file is not None:
+        df = pd.read_csv(uploaded_file)
+else:
+    df = default_df
+
+if df is None:
+    st.stop()
+
 st.sidebar.write("Dataset Shape:", df.shape)
 st.sidebar.write("Features:", df.shape[1] - 1)
 st.sidebar.markdown("---")
-
-st.sidebar.subheader("Download sample test CSV")
-sample_test = df.sample(20, random_state=1)
-csv_buffer = io.StringIO()
-sample_test.to_csv(csv_buffer, index=False)
-
-st.sidebar.download_button(
-    label="Download Sample Test Data",
-    data=csv_buffer.getvalue(),
-    file_name="sample_test_heart.csv",
-    mime="text/csv"
-)
-st.markdown("---")
-
-st.sidebar.subheader("Upload test CSV for prediction")
-uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
-st.markdown("---")
-
 
 X = df.drop("target", axis=1)
 y = df["target"]
@@ -105,54 +101,52 @@ recall = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 mcc = matthews_corrcoef(y_test, y_pred)
 
-st.subheader("Model Evaluation Metrics")
-col1, col2, col3 = st.columns(3)
-col1.metric("Accuracy", f"{accuracy:.4f}")
-col2.metric("AUC", f"{auc:.4f}")
-col3.metric("Precision", f"{precision:.4f}")
-col4, col5, col6 = st.columns(3)
-col4.metric("Recall", f"{recall:.4f}")
-col5.metric("F1 Score", f"{f1:.4f}")
-col6.metric("MCC", f"{mcc:.4f}")
+col_left, col_right = st.columns([1, 1])
+
+with col_left:
+    st.subheader("Model Evaluation Metrics")
+    st.metric("Accuracy", f"{accuracy:.4f}")
+    st.metric("AUC", f"{auc:.4f}")
+    st.metric("Precision", f"{precision:.4f}")
+    st.metric("Recall", f"{recall:.4f}")
+    st.metric("F1 Score", f"{f1:.4f}")
+    st.metric("MCC", f"{mcc:.4f}")
+
+with col_right:
+    st.subheader("Confusion Matrix")
+    cm = confusion_matrix(y_test, y_pred)
+    fig, ax = plt.subplots(figsize=(3,3))
+    ax.matshow(cm)
+    for i in range(len(cm)):
+        for j in range(len(cm)):
+            ax.text(j, i, cm[i, j], ha="center", va="center")
+    st.pyplot(fig)
 st.markdown("---")
 
-st.subheader("Confusion Matrix")
-cm = confusion_matrix(y_test, y_pred)
-fig, ax = plt.subplots(figsize=(3,3))
-ax.matshow(cm)
-plt.title("Confusion Matrix")
-plt.xlabel("Predicted")
-plt.ylabel("Actual")
+st.subheader("Prediction Analysis")
+analysis_col1, analysis_col2 = st.columns(2)
 
-for i in range(len(cm)):
-    for j in range(len(cm)):
-        plt.text(j, i, cm[i, j], ha="center", va="center")
+#age
+with analysis_col1:
+    st.write("Prediction vs Age")
+    temp_df = df.copy()
+    temp_df["Predicted"] = model.predict(scaler.transform(X))
+    fig_age, ax_age = plt.subplots()
+    ax_age.scatter(temp_df["age"], temp_df["Predicted"], alpha=0.3)
+    ax_age.set_xlabel("Age")
+    ax_age.set_ylabel("Predicted Class")
+    st.pyplot(fig_age)
 
-st.pyplot(fig)
+#sex
+with analysis_col2:
+    st.write("Prediction vs Sex")
+    sex_counts = temp_df.groupby(["sex", "Predicted"]).size().unstack()
+    fig_sex, ax_sex = plt.subplots()
+    sex_counts.plot(kind="bar", ax=ax_sex)
+    st.pyplot(fig_sex)
 st.markdown("---")
 
-if uploaded_file is not None:
-    test_data = pd.read_csv(uploaded_file)
-    st.subheader("Uploaded Data Preview")
-    st.dataframe(test_data.head())
-
-    test_scaled = scaler.transform(test_data.drop("target", axis=1))
-    predictions = model.predict(test_scaled)
-    test_data["Predicted Target"] = predictions
-
-    st.markdown("---")
-    st.subheader("Sample Predictions - 10 Rows")
-
-    preview_df = test_data[["Predicted Target"]].head(10)
-    st.table(preview_df)
-    st.markdown("---")
-
-    output_buffer = io.StringIO()
-    test_data.to_csv(output_buffer, index=False)
-
-    st.download_button(
-        "⬇ Download Full Predictions CSV",
-        output_buffer.getvalue(),
-        "predictions.csv",
-        "text/csv"
-    )
+st.subheader("Predictions - 10 Rows")
+preview_df = df.copy()
+preview_df["Predicted"] = model.predict(scaler.transform(X))
+st.table(preview_df[["age", "sex", "Predicted"]].head(10))
