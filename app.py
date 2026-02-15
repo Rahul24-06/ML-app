@@ -160,7 +160,7 @@ with analysis_col2:
     st.write("Prediction vs Sex")
     temp_df = df.copy()
     temp_df["Predicted"] = model.predict(scaler.transform(X))
-    temp_df["Sex_Label"] = temp_df["sex"].map({0: "Female", 1: "Male"})
+    temp_df["Sex_Label"] = temp_df["sex"].map({0: "F", 1: "M"})
     
     sex_counts = temp_df.groupby(["Sex_Label", "Predicted"]).size().unstack()
     fig_sex, ax_sex = plt.subplots()
