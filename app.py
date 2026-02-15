@@ -16,14 +16,20 @@ from xgboost import XGBClassifier
 
 st.set_page_config(page_title="Heart Disease ML App", layout="wide")
 st.title("Heart Disease Classification App")
+st.markdown("""
+    <h1 style='text-align: center; color: #FF4B4B;'>
+    Heart Disease Prediction Dashboard 
+    </h1>
+""", unsafe_allow_html=True)
+st.markdown("---")
 
 @st.cache_data
 def load_default_data():
     return pd.read_csv("heart.csv")
-
+    
 df = load_default_data()
-st.sidebar.header("Model Selection")
 
+st.sidebar.header("Model Selection")
 model_name = st.sidebar.selectbox(
     "Choose a Model",
     [
@@ -35,6 +41,9 @@ model_name = st.sidebar.selectbox(
         "XGBoost"
     ]
 )
+st.sidebar.markdown("---")
+st.sidebar.write("Dataset Shape:", df.shape)
+st.sidebar.write("Features:", df.shape[1] - 1)
 
 X = df.drop("target", axis=1)
 y = df["target"]
@@ -78,23 +87,19 @@ f1 = f1_score(y_test, y_pred)
 mcc = matthews_corrcoef(y_test, y_pred)
 
 st.subheader("Model Evaluation Metrics")
-metrics_df = pd.DataFrame({
-    "Metric": ["Accuracy", "AUC", "Precision", "Recall", "F1 Score", "MCC"],
-    "Value": [
-        round(accuracy, 4),
-        round(auc, 4),
-        round(precision, 4),
-        round(recall, 4),
-        round(f1, 4),
-        round(mcc, 4)
-    ]
-})
+col1, col2, col3 = st.columns(3)
+col1.metric("Accuracy", f"{accuracy:.4f}")
+col2.metric("AUC", f"{auc:.4f}")
+col3.metric("Precision", f"{precision:.4f}")
+col4, col5, col6 = st.columns(3)
+col4.metric("Recall", f"{recall:.4f}")
+col5.metric("F1 Score", f"{f1:.4f}")
+col6.metric("MCC", f"{mcc:.4f}")
+st.markdown("---")
 
-st.table(metrics_df)
 st.subheader("Confusion Matrix")
 cm = confusion_matrix(y_test, y_pred)
-
-fig, ax = plt.subplots()
+fig, ax = plt.subplots(figsize=(4,4))
 ax.matshow(cm)
 plt.title("Confusion Matrix")
 plt.xlabel("Predicted")
@@ -105,8 +110,10 @@ for i in range(len(cm)):
         plt.text(j, i, cm[i, j], ha="center", va="center")
 
 st.pyplot(fig)
-st.subheader("Download Sample Test CSV")
+st.markdown("---")
 
+
+st.subheader("Download sample test CSV")
 sample_test = df.sample(20, random_state=1)
 csv_buffer = io.StringIO()
 sample_test.to_csv(csv_buffer, index=False)
@@ -117,8 +124,9 @@ st.download_button(
     file_name="sample_test_heart.csv",
     mime="text/csv"
 )
+st.markdown("---")
 
-st.subheader("Upload Test CSV for Prediction")
+st.subheader("Upload test CSV for prediction")
 uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
 
 if uploaded_file is not None:
