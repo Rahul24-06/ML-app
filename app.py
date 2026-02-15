@@ -60,7 +60,7 @@ st.sidebar.download_button(
 st.markdown("---")
 
 st.sidebar.subheader("Upload test CSV for prediction")
-uploaded_file = st.file_uploader("Upload CSV file", type=["csv"])
+uploaded_file = st.sidebar.file_uploader("Upload CSV file", type=["csv"])
 st.markdown("---")
 
 
