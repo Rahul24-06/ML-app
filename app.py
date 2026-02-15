@@ -118,7 +118,7 @@ st.markdown("---")
 
 st.subheader("Confusion Matrix")
 cm = confusion_matrix(y_test, y_pred)
-fig, ax = plt.subplots(figsize=(4,4))
+fig, ax = plt.subplots(figsize=(3,3))
 ax.matshow(cm)
 plt.title("Confusion Matrix")
 plt.xlabel("Predicted")
