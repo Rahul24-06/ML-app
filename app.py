@@ -147,10 +147,18 @@ with analysis_col1:
 #sex
 with analysis_col2:
     st.write("Prediction vs Sex")
-    sex_counts = temp_df.groupby(["sex", "Predicted"]).size().unstack()
+    temp_df = df.copy()
+    temp_df["Predicted"] = model.predict(scaler.transform(X))
+    temp_df["Sex_Label"] = temp_df["sex"].map({0: "Female", 1: "Male"})
+    
+    sex_counts = temp_df.groupby(["Sex_Label", "Predicted"]).size().unstack()
     fig_sex, ax_sex = plt.subplots()
     sex_counts.plot(kind="bar", ax=ax_sex)
+    ax_sex.set_xlabel("Sex")
+    ax_sex.set_ylabel("Count")
+    ax_sex.legend(["No Disease (0)", "Disease (1)"])
     st.pyplot(fig_sex)
+
 st.markdown("---")
 
 
