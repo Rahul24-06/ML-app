@@ -101,7 +101,7 @@ recall = recall_score(y_test, y_pred)
 f1 = f1_score(y_test, y_pred)
 mcc = matthews_corrcoef(y_test, y_pred)
 
-col_left, col_right = st.columns([1, 1])
+col_left, col_middle, col_right = st.columns(3)
 
 with col_left:
     st.subheader("Model Evaluation Metrics")
@@ -112,15 +112,22 @@ with col_left:
     st.metric("F1 Score", f"{f1:.4f}")
     st.metric("MCC", f"{mcc:.4f}")
 
-with col_right:
+with col_middle:
     st.subheader("Confusion Matrix")
     cm = confusion_matrix(y_test, y_pred)
-    fig, ax = plt.subplots(figsize=(1,1))
+    fig, ax = plt.subplots(figsize=(2,2))
     ax.matshow(cm)
     for i in range(len(cm)):
         for j in range(len(cm)):
             ax.text(j, i, cm[i, j], ha="center", va="center")
     st.pyplot(fig)
+
+with col_middle:
+    st.subheader("Predictions - 10 Rows")
+    preview_df = df.copy()
+    preview_df["Predicted"] = model.predict(scaler.transform(X))
+    st.table(preview_df[["age", "sex", "Predicted"]].head(10))
+
 st.markdown("---")
 
 st.subheader("Prediction Analysis")
@@ -146,7 +153,4 @@ with analysis_col2:
     st.pyplot(fig_sex)
 st.markdown("---")
 
-st.subheader("Predictions - 10 Rows")
-preview_df = df.copy()
-preview_df["Predicted"] = model.predict(scaler.transform(X))
-st.table(preview_df[["age", "sex", "Predicted"]].head(10))
+
