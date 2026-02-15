@@ -133,7 +133,7 @@ with col_right:
     preview_df.to_csv(output_buffer, index=False)
 
     st.download_button(
-        label="⬇ Download CSV",
+        label="Download prediction CSV",
         data=output_buffer.getvalue(),
         file_name="predicted_heart_disease.csv",
         mime="text/csv"
