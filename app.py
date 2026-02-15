@@ -133,22 +133,26 @@ st.markdown("---")
 
 if uploaded_file is not None:
     test_data = pd.read_csv(uploaded_file)
-    st.write("Uploaded Data Preview:")
+    st.subheader("Uploaded Data Preview")
     st.dataframe(test_data.head())
 
     test_scaled = scaler.transform(test_data.drop("target", axis=1))
     predictions = model.predict(test_scaled)
-
     test_data["Predicted Target"] = predictions
-    st.write("Prediction Results:")
-    st.dataframe(test_data.head())
+
+    st.markdown("---")
+    st.subheader("Sample Predictions - 10 Rows")
+
+    preview_df = test_data[["Predicted Target"]].head(10)
+    st.table(preview_df)
+    st.markdown("---")
 
     output_buffer = io.StringIO()
     test_data.to_csv(output_buffer, index=False)
 
     st.download_button(
-        label="Download Predictions CSV",
-        data=output_buffer.getvalue(),
-        file_name="predictions.csv",
-        mime="text/csv"
+        "⬇ Download Full Predictions CSV",
+        output_buffer.getvalue(),
+        "predictions.csv",
+        "text/csv"
     )
