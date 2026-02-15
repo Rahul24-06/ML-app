@@ -122,7 +122,7 @@ with col_middle:
             ax.text(j, i, cm[i, j], ha="center", va="center")
     st.pyplot(fig)
 
-with col_middle:
+with col_right:
     st.subheader("Predictions - 10 Rows")
     preview_df = df.copy()
     preview_df["Predicted"] = model.predict(scaler.transform(X))
