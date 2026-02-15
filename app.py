@@ -120,6 +120,7 @@ with col_middle:
     for i in range(len(cm)):
         for j in range(len(cm)):
             ax.text(j, i, cm[i, j], ha="center", va="center")
+    plt.tight_layout()  
     st.pyplot(fig)
 
 with col_right:
