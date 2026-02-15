@@ -156,7 +156,7 @@ with analysis_col2:
     sex_counts.plot(kind="bar", ax=ax_sex)
     ax_sex.set_xlabel("Sex")
     ax_sex.set_ylabel("Count")
-    ax_sex.legend(["No Disease (0)", "Disease (1)"])
+    ax_sex.legend(["No Disease", "Disease"])
     st.pyplot(fig_sex)
 
 st.markdown("---")
