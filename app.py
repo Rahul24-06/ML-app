@@ -119,7 +119,7 @@ with col_middle:
     ax.matshow(cm)
     for i in range(len(cm)):
         for j in range(len(cm)):
-            ax.text(j, i, cm[i, j], ha="center", va="center")
+            ax.text(j, i, cm[i, j], ha="center", va="center",  fontsize=8)
     plt.tight_layout()  
     st.pyplot(fig)
 
