@@ -128,6 +128,17 @@ with col_right:
     preview_df["Predicted"] = model.predict(scaler.transform(X))
     st.table(preview_df[["age", "sex", "Predicted"]].head(10))
 
+    st.markdown("---")
+    output_buffer = io.StringIO()
+    preview_df.to_csv(output_buffer, index=False)
+
+    st.download_button(
+        label="⬇ Download CSV",
+        data=output_buffer.getvalue(),
+        file_name="predicted_heart_disease.csv",
+        mime="text/csv"
+    )
+
 st.markdown("---")
 
 st.subheader("Prediction Analysis")
@@ -156,7 +167,7 @@ with analysis_col2:
     sex_counts.plot(kind="bar", ax=ax_sex)
     ax_sex.set_xlabel("Sex")
     ax_sex.set_ylabel("Count")
-    ax_sex.legend(["No Disease", "Disease"])
+    ax_sex.legend(["No Disease (0)", "Disease (1)"])
     st.pyplot(fig_sex)
 
 st.markdown("---")
